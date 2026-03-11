@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from 'styled-components'
+import { Nav } from 'react-bootstrap'
 
 /*
  styled-components 장점
@@ -51,6 +52,16 @@ function Detail(props) {
     let [count, setCount] = useState(0);
     let [alerts, setAlerts] = useState(true);
     let [num, setNum] = useState('');
+    let [tab, setTab] = useState(0) // 0이면 0번째 탭 내용이 보이는 상태, 1이면 1번째 탭 내용이 보임, 2이면 2번째 탭 내용이 보임.
+    let [load, setLoad] = useState('')
+
+    useEffect(()=>{
+        let b = setTimeout(()=>{ setLoad('end') }, 100)
+        return ()=>{
+            clearTimeout(b)
+            setLoad('')
+        }
+    }, [])
 
     useEffect(() => {
         // mount, update시 여기 코드 실행됨
@@ -119,7 +130,7 @@ function Detail(props) {
     /* 데이터는 한 곳에 잘 보관하기. 컴포넌트마다 쓰게 되면 나중에 수정하기 힘들어짐. */
 
     return (
-        <div className="container">
+        <div className={`container start ${load}`}>
             {/* <Box> */}
                 <YellowBtn $bg="orange">버튼</YellowBtn>
                 <YellowBtn $bg="blue">버튼</YellowBtn>
@@ -160,8 +171,73 @@ function Detail(props) {
                     <button className="btn btn-danger">주문하기</button> 
                 </div>
             </div>
+
+            <Nav variant="tabs"  defaultActiveKey="link0">
+                <Nav.Item>
+                    <Nav.Link onClick={()=>{ setTab(0) }} eventKey="link0">버튼0</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link onClick={()=>{ setTab(1) }} eventKey="link1">버튼1</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link onClick={()=>{ setTab(2) }} eventKey="link2">버튼2</Nav.Link>
+                </Nav.Item>
+            </Nav>
+            <TabContent tab={tab} />
+            {
+                /* state가 0이면 내용 0 보이기, state가 1이면 내용1 보이기, state가 2면 내용2 보이기 */
+                // 삼항 연산자는 연속해서 쓸 수 없음
+                // tab == 0 ? <div>내용0</div> : null
+            }
+            {/* <div>내용0</div>
+            <div>내용1</div>
+            <div>내용2</div> */}
         </div>
     )
+}
+
+
+/* props 등록하기 귀찮으면 props전달한 이름을 적으면 됨.
+    function TabContent({tab, num, ..})
+*/
+function TabContent({tab}){
+    let [fade, setFade] = useState('')
+    // tab state가 변할 때 end 클래스 부착
+    /* 리액트의 automatic batching 기능
+    state변경하는 함수들이 근처에 있다면 하나로 합쳐서 최종적으로 한번만 state변경을 해줌.
+    state변경이 일어나고 마지막에 딱 한번만 재렌더링을 해줌.
+    재렌더링X -> state변경함수()
+    재렌더링X -> state변경함수()
+    재렌더링X -> state변경함수()
+    재렌더링O -> state변경함수()
+    */
+    useEffect(()=>{
+        let a = setTimeout(()=>{ setFade('end') }, 100)
+        // setFade('end') // 순서 2
+        return ()=>{
+            clearTimeout(a)
+            setFade('') // 순서 1
+        }
+    }, [tab])
+    // return을 꼭 써야 작동
+    // 방법1.
+    // if(props.tab == 0){
+    //     return <div>내용0</div>
+    // } else if (props.tab == 1){
+    //     return <div>내용1</div>
+    // } else if (props.tab == 2){
+    //     return <div>내용2</div>
+    // }
+
+    // 방법2.
+    /*  let fruits = ['사과', '바나나', '포도'];
+        console.log(fruits[0]); -> '사과'
+
+        console.log( ['사과', '바나나', '포도'][1] ); // 변수에 담지 않고 직접 대괄호를 붙여도 똑같이 작동함. -> '바나나'
+    */
+    return ( <div className={`start ${fade}`}>
+        { [<div>내용0</div>, <div>내용1</div>, <div>내용2</div>][tab] }
+    </div> )
 }
 
 export default Detail;
