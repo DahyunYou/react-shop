@@ -1,20 +1,24 @@
-import { useState, useEffect } from 'react';
-import { Button, Navbar, Container, Nav } from 'react-bootstrap';
+import { useState, createContext } from 'react';
+import { Navbar, Container, Nav } from 'react-bootstrap';
 import './App.css';
 import bg from './img/test.png';
-import data from './data' // js 확장자 생략 가능
+import data from './data.js' // js 확장자 생략 가능
 // import {a, b} from './data' // export 여러개일 경우
-import List from './pages/List'
+import List from './routes/List'
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom'
-import Detail from './pages/Detail'
+import Detail from './routes/Detail.js'
 import axios from 'axios'
+import Cart from './routes/Cart.js'
+
+export let Context1 = createContext() // Context는 state 보관함
 
 function App() {
 	let [shoes, setShoes] = useState(data);
 	let [clickCount, setClickCount] = useState(0)
 	let navigate = useNavigate(); // 페이지 이동을 도와주는 함수 hook(유용한 것들이 들어있는 함수)
 	// console.log(shoes[0].price);
-	console.log(data)
+	let [stock] = useState([10, 11, 12]) // 10(1번째 상품의 재고), 11(2번째 상품의 재고), 12(3번째 상품의 재고) => Detail, TabContent에서 사용
+	// console.log(data)
 
 	// public 폴더 안에 있는 이미지를 사용할 땐 '/logo192.png' 이런 식으로 /(슬래시)부터 시작
 	// <img src={process.env.PUBLIC_URL + '/logo192.png'} => 이게 public폴더 이미지 쓰는 권장 방식
@@ -29,6 +33,7 @@ function App() {
 						<Nav.Link onClick={()=>{ navigate('/') }}>Home</Nav.Link>
 						{/* navigate 함수 실행하면 페이지 이동됨 */}
 						<Nav.Link onClick={()=>{ navigate('/detail/0') }}>Detail</Nav.Link>
+						<Nav.Link onClick={()=>{ navigate('/cart') }}>Cart</Nav.Link>
 					</Nav>
 				</Container>
 			</Navbar>
@@ -150,9 +155,15 @@ function App() {
 					(참고) URL파라미터 만들 때 여러개 가능, 파라미터랑 일반 문자랑 섞어서 써도 됨.
 					예) <Route path="/detail/:id/:sd/fsdf/:dfdf" element={<Detail shoes={shoes} />}/>
 				*/}
-				<Route path="/detail/:id" element={<Detail shoes={shoes} />}/>
+				<Route path="/detail/:id" element={
+					<Context1.Provider value={{ stock }}>
+						<Detail shoes={shoes} /> {/* 여기 안의 모든 컴포넌트는 stock, shoes 사용 가능 */}
+					</Context1.Provider>
+				}/>
 				{/* *(별표)는 모든 것(위에 만들어 놓은 Route 외 모든 것을 의미) */}
 				<Route path="*" element={<div>없는 페이지에요</div>}/>
+
+				<Route path="/cart" element={<Cart/>}/>
 
 				{/* Nested Routes (태그 안에 태그가 들어감)
 					장점1. route 작성이 간단해짐.
@@ -233,6 +244,34 @@ function Event(){
 페이지 나누는 법(리액트 사용)
 1. 컴포넌트 만들어서 상세 페이지 내용 채움.
 2. 누가 /detail 접속하면 그 컴포넌트 보여줌.
- */
+*/
+
+/* Single Page Application의 단점
+- 컴포넌트 간 state 공유가 어려움.
+예) Aboute 컴포넌트에 있던 state는 Card 컴포넌트에서 못 씀.
+- App
+  - Detail
+    - TabContent
+	=> 이런 구조에서 App에 있던 shoes state를 TabContent에서 사용하려면 App -> Detail -> TabContent 두 단계를 거쳐 state를 전송해야 함.
+- Context API 사용하면 props 전송 없이 state 공유 가능
+  - 실무에서는 성능 이슈, 컴포넌트 재활용이 어려워 잘 쓰지 않음.
+*/
+
+/* Context API 
+셋팅1. createContext()
+셋팅2. <Context>로 원하는 컴포넌트 감싸기
+셋팅3. value={{ state1, state2, ... }}
+
+state 사용은
+1. Context를 import
+2. useContext(Context)
+
+Context API 특징
+1. state 변경 시(재렌더링 시) 쓸데없는 것까지 재렌더링
+=> {stock} 변경 시 stock 안쓰는 것들도 무조건 재렌더링
+2. 나중에 컴포넌트 재사용이 어려움.
+=> Context API보다는 외부 라이브러리 사용함.
+*/
+
 
 export default App;
