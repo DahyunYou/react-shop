@@ -50,7 +50,7 @@ let cart = createSlice({
 	name : 'cart',
 	initialState : [
 		{id : 0, name : 'White and Black', count : 2},
-		{id : 2, name : 'Grey Yordan', count : 1}
+		{id : 1, name : 'Grey Yordan', count : 1}
 	],
 	reducers : {
 		addCount(state, action){
@@ -61,8 +61,16 @@ let cart = createSlice({
 		},
 		// Detail.js의 주문하기 버튼 누르면 state에 상품 추가
 		addItem(state, action) {
-			// state.push({id : 1, name : 'Red Knit', count : 1}) // array 뒤에 자료 추가해주는 함수
-			state.push(action.payload)
+			let num = state.findIndex((item)=>{
+				return item.id == action.payload.id
+			})
+
+			if(num >= 0) {
+				state[num].count++
+			} else {
+				// state.push({id : 1, name : 'Red Knit', count : 1}) // array 뒤에 자료 추가해주는 함수
+				state.push(action.payload)
+			}
 		}
 	}
 })

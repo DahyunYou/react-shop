@@ -179,7 +179,11 @@ function Detail(props) {
                     <p>{props.shoes[id].content}</p>
                     <p>{props.shoes[id].price}</p>
                     <button className="btn btn-danger" onClick={()=>{
-						dispatch(addItem({id : 1, name : 'Red Knit', count : 1}))
+						dispatch(addItem({
+							id: props.shoes[id].id,
+							name: props.shoes[id].title,
+							count: 1
+						}))
 					}}>주문하기</button> 
                 </div>
             </div>
