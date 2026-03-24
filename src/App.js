@@ -18,7 +18,14 @@ function App() {
 	let navigate = useNavigate(); // 페이지 이동을 도와주는 함수 hook(유용한 것들이 들어있는 함수)
 	// console.log(shoes[0].price);
 	let [stock] = useState([10, 11, 12]) // 10(1번째 상품의 재고), 11(2번째 상품의 재고), 12(3번째 상품의 재고) => Detail, TabContent에서 사용
-	// console.log(data)
+	
+	/* 개발자 도구 > Local Storage
+	1. key : value 형태로 저장 가능
+	2. 문자 데이터만 저장 가능, 최대 5MB까지 문자만 저장 가능
+	3. 사이트 재접속해도 남아있음.(브라우저 청소하면 삭제됨)
+
+	Session Storage는 브라우저 끄면 저장된 데이터 날아감.
+	*/
 
 	// public 폴더 안에 있는 이미지를 사용할 땐 '/logo192.png' 이런 식으로 /(슬래시)부터 시작
 	// <img src={process.env.PUBLIC_URL + '/logo192.png'} => 이게 public폴더 이미지 쓰는 권장 방식
