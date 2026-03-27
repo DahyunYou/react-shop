@@ -5,6 +5,7 @@ import { Nav } from 'react-bootstrap'
 import { Context1 } from '../App.js'
 import { addItem } from "./../store.js";
 import { useDispatch } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
 
 /*
  styled-components 장점
@@ -52,6 +53,22 @@ let Box = styled.div`
 // }
 
 function Detail(props) {
+
+	let q = useQueryClient()
+
+	// let result = useQuery({
+	// 	queryKey: ['getName'],
+	// 	refetchOnWindowFocus: false, // 다른 창에 갔다가 창으로 복귀 시 ajax 요청 재전송X
+	// 	retry: 10, // 실패시 재시도 횟수
+	// 	queryFn: () => { 
+	// 		//ajax요청
+	// 		return axios.get('http://codingapple1.github.io/userdata.json') //return과 중괄호는 함께 생략 가능
+	// 		.then(a => a.data)
+	// 	}
+	// })
+	let result = q.getQueriesData(['getName']) // 위에거 다 안쓰고 이 한 문장으로 캐싱된 데이터만 빼서 쓸 수 있음.
+	console.log(result) // result.isSuccess같은 예외상황일 때는 직접 처리해야함.
+
 	// 보관함 해체해줌
 	let {stock} = useContext(Context1) // destructuring 문법
 

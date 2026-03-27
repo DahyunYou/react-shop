@@ -1,9 +1,31 @@
+import { memo, useMemo, useState } from 'react'
 import {Table} from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { changeName, increase } from './../store/userSlice.js'
 import { addCount } from './../store.js'
 
+function Child() {
+	console.log("재렌더링됨")
+	return <div>자식임</div>
+}
+// 위에도 컴포넌트 짜는 코드이지만 아래처럼 짜도 컴포넌트가 됨.
+// 꼭 필요할 때만 재렌더링하려면 memo. props가 변할 때만 재렌더링해줌.
+// let Child = memo(function() {
+// 	console.log("재렌더링됨")
+// 	return <div>자식임</div>
+// })
+
+// useMemo 사용법
+// Cart컴포넌트 렌더링 시 함수()를 1회만 실행해 줌.
+// useEffect와 다른 점: useEffect는 html실행이 다 끝나면 그때 실행, useMemo는 html실행이 될 때 같이 실행. 실행 시점의 차이.
+// function 함수(){
+// 	return 반복문10억번돌린결과;
+// }
+
 function Cart(){
+	// let result = 함수();
+	// Cart컴포넌트 렌더링 시 함수()를 1회만 실행해 줌.
+	// let result = useMemo(()=>{return 함수()}, [state])
 
 	// store에 있던 state를 가져와 주는 함수
 	let data = useSelector((state) => {return state}) // Redux store의 state 꺼내는 법
@@ -16,8 +38,17 @@ function Cart(){
 
 	((state) => {return state.stock})와 ((state) => state.stock)은 같은 것. 중괄호와 return은 생략 가능
 	*/
+
+	let [count, setCount] = useState(0);
+
 	return (
 		<div>
+			{/* Cart컴포넌트가 재렌더링 되면 그 안에 자식 컴포넌트도 전부 재렌더링 됨. 
+			자식 컴포넌트를 꼭 필요할 때만(무거운 컴포넌트) 재렌더링하려면 memo
+			*/}
+			<Child count={count}></Child>
+			<button onClick={()=>{ setCount(count+1) }}>+</button>
+
 			{data.user.name} {data.user.age} 의 장바구니
 			<button onClick={()=>{ dispatch(increase(100)) }}>버튼</button>
 
